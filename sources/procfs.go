@@ -813,16 +813,17 @@ func (s *lustreProcfsSource) gaugeMetric(labels []string, labelValues []string, 
 	)
 }
 
-func (s *lustreProcfsSource) untypedMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
-	return prometheus.MustNewConstMetric(
-		prometheus.NewDesc(
-			prometheus.BuildFQName(Namespace, "", name),
-			helpText,
-			labels,
-			nil,
-		),
-		prometheus.UntypedValue,
-		value,
-		labelValues...,
-	)
-}
+// TODO: Move with metric "pool/granted" to "/sys/fs/lustre/" path
+// func (s *lustreProcfsSource) untypedMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
+// 	return prometheus.MustNewConstMetric(
+// 		prometheus.NewDesc(
+// 			prometheus.BuildFQName(Namespace, "", name),
+// 			helpText,
+// 			labels,
+// 			nil,
+// 		),
+// 		prometheus.UntypedValue,
+// 		value,
+// 		labelValues...,
+// 	)
+// }
