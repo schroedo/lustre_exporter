@@ -24,6 +24,8 @@ BIN_DIR         ?= $(shell pwd)
 
 all: format lint build test
 
+test: 	export GO111MODULE = off
+
 test:
 	@echo ">> running tests"
 	@$(GO) test -short $(pkgs)
@@ -32,9 +34,13 @@ format:
 	@echo ">> formatting code"
 	@$(GO) fmt $(pkgs)
 
+lint: 	export GO111MODULE = off
+
 lint: $(GOLINTER)
 	@echo ">> linting code"
 	@$(GOLINTER) run
+
+build: 	export GO111MODULE = off
 
 build: $(PROMU)
 	@echo ">> building binaries"
