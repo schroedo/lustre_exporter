@@ -1,5 +1,21 @@
 # Change Log
 
+## [v2.1.3](https://github.com/GSI-HPC/lustre_exporter/releases/tag/2.1.3) (2022-01-24)
+- Add Docker build container
+- Remove depencency to Promu
+- Use go.mod tool
+- Use logrus for logging
+- Skip jobstat blocks with empty job\_id field set
+- Simplify regex for capturing jobids
+
+## [v2.1.2](https://github.com/GSI-HPC/lustre_exporter/releases/tag/2.1.2) (2021-12-10)
+- Update jobid regex pattern for less restrivtive parsing
+
+## [v2.1.1](https://github.com/GSI-HPC/lustre_exporter/releases/tag/2.1.1) (2021-11-04)
+- Add new LCTL source
+- Implement changelog processing
+- Add function for capturing job stats with regex
+
 ## [v2.1.0](https://github.com/GSI-HPC/lustre_exporter/tree/v2.1.0) (2021-03-05)
 [Full Changelog](https://github.com/GSI-HPC/lustre_exporter/compare/v2.0.0...v2.1.0)
 

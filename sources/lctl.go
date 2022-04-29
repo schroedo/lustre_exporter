@@ -18,30 +18,30 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
-	"os/user"
 	"path/filepath"
+	"reflect"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
-	lctlCmdCall                       = "" // If user not root use sudo as command, otherwise lctl
-	lctlCmdArgs                       = []string{}
+	lctlGetParamArgs                  = []string{"lctl", "get_param"}
 	changelogTargetRegexPattern       = regexp.MustCompile(`mdd.([\w\d-]+-MDT[\d]+).changelog_users=`)
 	changelogCurrentIndexRegexPattern = regexp.MustCompile(`current index: (\d+)`)
 	changelogUserRegexPattern         = regexp.MustCompile(`(?ms:(cl\d+)\s+(\d+) \((\d+)\))`)
 )
 
 const (
-	changelogUsersCmdArg = "mdd.*-*.changelog_users"
+	lctlParamChangelogUsers = "mdd.*-*.changelog_users"
 )
 
 type lustreLctlMetricCreator struct {
-	argument      string
+	lctlParam     string
 	metricHandler func(string) ([]prometheus.Metric, error)
 }
 
@@ -86,25 +86,13 @@ func newLustreLctlSource() LustreSource {
 	if LctlCommandMode {
 		_, err := exec.LookPath("lctl")
 		if err != nil {
-			log.Errorln(err)
+			log.Error(err)
 			return nil
 		}
-		user, err := user.Current()
+		_, err = exec.LookPath("sudo")
 		if err != nil {
-			log.Errorln(err)
+			log.Error(err)
 			return nil
-		}
-		if user.Uid == "0" { // root user
-			lctlCmdCall = "lctl"
-			lctlCmdArgs = []string{"get_param", changelogUsersCmdArg}
-		} else {
-			_, err := exec.LookPath("sudo")
-			if err != nil {
-				log.Errorln(err)
-				return nil
-			}
-			lctlCmdCall = "sudo"
-			lctlCmdArgs = []string{"lctl", "get_param", changelogUsersCmdArg}
 		}
 	}
 	var l lustreLctlSource
@@ -115,9 +103,9 @@ func newLustreLctlSource() LustreSource {
 
 func (s *lustreLctlSource) Update(ch chan<- prometheus.Metric) (err error) {
 	for _, metricCreator := range s.metricCreator {
-		metricList, err := metricCreator.metricHandler(metricCreator.argument)
+		metricList, err := metricCreator.metricHandler(metricCreator.lctlParam)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s - %s", runtime.FuncForPC(reflect.ValueOf(metricCreator.metricHandler).Pointer()).Name(), err)
 		}
 		for _, metric := range metricList {
 			ch <- metric
@@ -129,25 +117,31 @@ func (s *lustreLctlSource) Update(ch chan<- prometheus.Metric) (err error) {
 func (s *lustreLctlSource) generateMDTMetricCreator(filter string) {
 	if filter == extended {
 		s.metricCreator = append(s.metricCreator,
-			lustreLctlMetricCreator{argument: changelogUsersCmdArg, metricHandler: s.createMDTChangelogUsersMetrics})
+			lustreLctlMetricCreator{
+				lctlParam:     lctlParamChangelogUsers,
+				metricHandler: s.createMDTChangelogUsersMetrics})
 	}
 }
 
-func (s *lustreLctlSource) createMDTChangelogUsersMetrics(text string) ([]prometheus.Metric, error) {
+func (s *lustreLctlSource) createMDTChangelogUsersMetrics(lctlParam string) ([]prometheus.Metric, error) {
 	metricList := make([]prometheus.Metric, 1)
 	var target string
 	var data string
 	var err error
 
 	if LctlCommandMode {
-		out, err := exec.Command(lctlCmdCall, lctlCmdArgs...).Output()
+		lctlCmdArgs := append(lctlGetParamArgs, lctlParam)
+		if log.GetLevel() == log.DebugLevel {
+			log.Debugf("Executing command: %s", "sudo "+strings.Join(lctlCmdArgs, " "))
+		}
+		out, err := exec.Command("sudo", lctlCmdArgs...).Output()
 		if err != nil {
 			return nil, err
 		}
 		data = string(out)
 
 	} else {
-		path := strings.ReplaceAll(changelogUsersCmdArg, ".", "/")
+		path := strings.ReplaceAll(lctlParam, ".", "/")
 		paths, err := filepath.Glob("lctl/" + path)
 		if err != nil {
 			return nil, err
@@ -172,7 +166,7 @@ func (s *lustreLctlSource) createMDTChangelogUsersMetrics(text string) ([]promet
 		return nil, err
 	}
 
-	metricList[0] = s.counterMetric(
+	metricList[0] = counterMetric(
 		[]string{"component", "target"},
 		[]string{"mdt", target},
 		"changelog_current_index",
@@ -194,7 +188,7 @@ func (s *lustreLctlSource) createMDTChangelogUsersMetrics(text string) ([]promet
 			return nil, err
 		}
 
-		metric := s.counterMetric(
+		metric := counterMetric(
 			[]string{"component", "target", "id"},
 			[]string{"mdt", target, id},
 			"changelog_user_index",
@@ -202,7 +196,7 @@ func (s *lustreLctlSource) createMDTChangelogUsersMetrics(text string) ([]promet
 			index)
 		metricList = append(metricList, metric)
 
-		metric = s.gaugeMetric(
+		metric = gaugeMetric(
 			[]string{"component", "target", "id"},
 			[]string{"mdt", target, id},
 			"changelog_user_idle_time",
@@ -212,32 +206,4 @@ func (s *lustreLctlSource) createMDTChangelogUsersMetrics(text string) ([]promet
 	}
 
 	return metricList, nil
-}
-
-func (s *lustreLctlSource) counterMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
-	return prometheus.MustNewConstMetric(
-		prometheus.NewDesc(
-			prometheus.BuildFQName(Namespace, "", name),
-			helpText,
-			labels,
-			nil,
-		),
-		prometheus.CounterValue,
-		value,
-		labelValues...,
-	)
-}
-
-func (s *lustreLctlSource) gaugeMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
-	return prometheus.MustNewConstMetric(
-		prometheus.NewDesc(
-			prometheus.BuildFQName(Namespace, "", name),
-			helpText,
-			labels,
-			nil,
-		),
-		prometheus.GaugeValue,
-		value,
-		labelValues...,
-	)
 }

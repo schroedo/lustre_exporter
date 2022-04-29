@@ -38,3 +38,45 @@ var Factories = make(map[string]func() LustreSource)
 type LustreSource interface {
 	Update(ch chan<- prometheus.Metric) (err error)
 }
+
+func counterMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		prometheus.NewDesc(
+			prometheus.BuildFQName(Namespace, "", name),
+			helpText,
+			labels,
+			nil,
+		),
+		prometheus.CounterValue,
+		value,
+		labelValues...,
+	)
+}
+
+func gaugeMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		prometheus.NewDesc(
+			prometheus.BuildFQName(Namespace, "", name),
+			helpText,
+			labels,
+			nil,
+		),
+		prometheus.GaugeValue,
+		value,
+		labelValues...,
+	)
+}
+
+func untypedMetric(labels []string, labelValues []string, name string, helpText string, value float64) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		prometheus.NewDesc(
+			prometheus.BuildFQName(Namespace, "", name),
+			helpText,
+			labels,
+			nil,
+		),
+		prometheus.UntypedValue,
+		value,
+		labelValues...,
+	)
+}

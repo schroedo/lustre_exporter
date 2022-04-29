@@ -1,1 +1,1 @@
-OPTIONS="--collector.ost=core --collector.mdt=core --collector.mgs=core --collector.mds=core --collector.client=core --collector.generic=core --collector.lnet=core --collector.health=core"
+OPTIONS="--collector.ost=core --collector.mdt=core --collector.mgs=core --collector.mds=core --collector.client=core --collector.generic=core --collector.lnet=core --collector.health=core --log.file=/var/log/prometheus-lustre-exporter/out.log"

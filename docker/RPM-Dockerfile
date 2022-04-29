@@ -1,0 +1,21 @@
+FROM centos:7
+MAINTAINER jknedlik <j.knedlik@gsi.de>
+WORKDIR /tmp
+# get dependencies from yum
+RUN yum install -y git make gcc rpm-build
+# get & install go
+RUN curl -LO https://go.dev/dl/go1.17.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xvzf go1.17.5.linux-amd64.tar.gz
+ENV PATH=$PATH:/usr/local/go/bin
+#build lustre_exporter
+COPY . /go/lustre_exporter
+WORKDIR /go/lustre_exporter
+RUN make build
+#build rpm
+RUN rpm/build.sh
+#prepare mountpoint for copy
+RUN mkdir /rpm
+#copy rpm int /rpm
+ENTRYPOINT ["/bin/sh"]
+ENTRYPOINT ["cp"]
+CMD ["-r","/root/rpmbuild/RPMS/x86_64/","/rpm/build"]

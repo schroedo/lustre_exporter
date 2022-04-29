@@ -211,32 +211,6 @@ func TestCollector(t *testing.T) {
 	sources.LctlCommandMode = false
 
 	expectedMetrics := []promType{
-		// TODO: OST Metrics to be moved to /sys/fs/lustre
-		// {"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
-		// {"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
-		// {"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
-		// {"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
-		// {"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 4.0828928e+07, false},
-		// {"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 4.0828928e+07, false},
-		// {"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 4.0828928e+07, false},
-		// {"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 4.0828928e+07, false},
-		// {"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
-		// {"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
-		// {"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
-		// {"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
-		// {"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 128, false},
-		// {"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 128, false},
-		// {"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 128, false},
-		// {"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 128, false},
-		// {"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 16, false},
-		// {"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 16, false},
-		// {"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 16, false},
-		// {"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 16, false},
-		// {"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
-		// {"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
-		// {"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
-		// {"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
-
 		// OST Metrics
 		{"lustre_stats_total", "Number of operations the filesystem has performed.", counter, []labelPair{{"component", "ost"}, {"operation", "connect"}, {"target", "lustrefs-OST0000"}}, 1, false},
 		{"lustre_stats_total", "Number of operations the filesystem has performed.", counter, []labelPair{{"component", "ost"}, {"operation", "connect"}, {"target", "lustrefs-OST0002"}}, 1, false},
@@ -1196,6 +1170,58 @@ func TestCollector(t *testing.T) {
 		{"lustre_disk_io", "Current number of I/O operations that are processing during the snapshot.", gauge, []labelPair{{"component", "ost"}, {"operation", "read"}, {"size", "8"}, {"target", "lustrefs-OST0000"}}, 0, false},
 		{"lustre_disk_io", "Current number of I/O operations that are processing during the snapshot.", gauge, []labelPair{{"component", "ost"}, {"operation", "read"}, {"size", "9"}, {"target", "lustrefs-OST0000"}}, 0, false},
 		{"lustre_blocksize_bytes", "Filesystem block size in bytes", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 1.048576e+06, false},
+		{"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
+		{"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
+		{"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
+		{"lustre_degraded", "Binary indicator as to whether or not the pool is degraded - 0 for not degraded, 1 for degraded", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
+		{"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 4.0828928e+07, false},
+		{"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 4.0828928e+07, false},
+		{"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 4.0828928e+07, false},
+		{"lustre_grant_precreate_capacity_bytes", "Maximum space in bytes that clients can preallocate for objects", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 4.0828928e+07, false},
+		{"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
+		{"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
+		{"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
+		{"lustre_lfsck_speed_limit", "Maximum operations per second LFSCK (Lustre filesystem verification) can run", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
+		{"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 128, false},
+		{"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 128, false},
+		{"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 128, false},
+		{"lustre_precreate_batch", "Maximum number of objects that can be included in a single transaction", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 128, false},
+		{"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 16, false},
+		{"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 16, false},
+		{"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 16, false},
+		{"lustre_soft_sync_limit", "Number of RPCs necessary before triggering a sync", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 16, false},
+		{"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
+		{"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
+		{"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
+		{"lustre_sync_journal_enabled", "Binary indicator as to whether or not the journal is set for asynchronous commits", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
+		{"lustre_lock_count", "Number of locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 1, false},
+		{"lustre_lock_count", "Number of locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
+		{"lustre_lock_count", "Number of locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
+		{"lustre_lock_count", "Number of locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
+		{"lustre_lock_timeout", "Number of lock timeouts", counter, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 0, false},
+		{"lustre_lock_timeout", "Number of lock timeouts", counter, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 0, false},
+		{"lustre_lock_timeout", "Number of lock timeouts", counter, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 0, false},
+		{"lustre_lock_timeout", "Number of lock timeouts", counter, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 0, false},
+		{"lustre_lock_contended", "Number of contended locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 32, false},
+		{"lustre_lock_contended", "Number of contended locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 32, false},
+		{"lustre_lock_contended", "Number of contended locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 32, false},
+		{"lustre_lock_contended", "Number of contended locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 32, false},
+		{"lustre_lock_contention_seconds", "Time in seconds during which locks were contended", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 2, false},
+		{"lustre_lock_contention_seconds", "Time in seconds during which locks were contended", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 2, false},
+		{"lustre_lock_contention_seconds", "Time in seconds during which locks were contended", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 2, false},
+		{"lustre_lock_contention_seconds", "Time in seconds during which locks were contended", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 2, false},
+		{"lustre_lock_granted", "Number of granted locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 1200, false},
+		{"lustre_lock_granted", "Number of granted locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 1200, false},
+		{"lustre_lock_granted", "Number of granted locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 1200, false},
+		{"lustre_lock_granted", "Number of granted locks", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 1200, false},
+		{"lustre_lock_grant_plan", "Number of planned lock grants per second", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 32207, false},
+		{"lustre_lock_grant_plan", "Number of planned lock grants per second", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 128827, false},
+		{"lustre_lock_grant_plan", "Number of planned lock grants per second", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 32207, false},
+		{"lustre_lock_grant_plan", "Number of planned lock grants per second", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 128827, false},
+		{"lustre_lock_grant_rate", "Lock grant rate", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0000"}}, 31, false},
+		{"lustre_lock_grant_rate", "Lock grant rate", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0002"}}, 31, false},
+		{"lustre_lock_grant_rate", "Lock grant rate", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0004"}}, 31, false},
+		{"lustre_lock_grant_rate", "Lock grant rate", gauge, []labelPair{{"component", "ost"}, {"target", "lustrefs-OST0006"}}, 31, false},
 
 		// MDT Metrics
 		{"lustre_changelog_current_index", "Changelog current index.", counter, []labelPair{{"component", "mdt"}, {"target", "lustrefs-MDT0000"}}, 34, false},
@@ -1702,7 +1728,7 @@ func TestCollector(t *testing.T) {
 	}
 
 	// These following metrics should be filtered out as they are specific to the deployment and will always change
-	blacklistedMetrics := []string{"go_", "http_", "process_", "lustre_exporter_"}
+	blacklistedMetrics := []string{"go_", "http_", "process_", "lustre_exporter_", "promhttp_"}
 
 	for i, metric := range expectedMetrics {
 		newLabels, err := sortByKey(metric.Labels)
@@ -1718,11 +1744,12 @@ func TestCollector(t *testing.T) {
 		var missingMetrics []promType // Array of metrics that are missing for the given target
 		enabledSources := []string{"procfs", "procsys", "sysfs", "lctl"}
 
-		sourceList, err := loadSources(enabledSources)
-		if err != nil {
+		sourceList, errList := loadSources(enabledSources)
+
+		if errList != nil {
 			t.Fatal("Unable to load sources")
 		}
-		if err = prometheus.Register(LustreSource{sourceList: sourceList}); err != nil {
+		if err := prometheus.Register(LustreSource{sourceList: sourceList}); err != nil {
 			t.Fatalf("Failed to register for target: %s", target)
 		}
 

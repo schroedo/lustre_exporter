@@ -3,8 +3,8 @@
 %define        __os_install_post %{_dbpath}/brp-compress
 
 Name:           prometheus-lustre-exporter
-Version:        2.1.2
-Release:        1%{?dist}
+Version:        VERSION
+Release:        1.0%{?dist}
 Summary:        Prometheus exporter for use with the Lustre parallel filesystem
 Group:          Monitoring
 
@@ -33,7 +33,6 @@ The Lustre exporter for Prometheus will expose all Lustre procfs and procsys dat
 
 %install
 rm -rf %{buildroot}
-mkdir -p  %{buildroot}
 mkdir -p %{buildroot}%{_unitdir}/
 cp usr/lib/systemd/system/%{name}.service %{buildroot}%{_unitdir}/
 
@@ -48,9 +47,7 @@ getent group prometheus >/dev/null || groupadd -r prometheus
 getent passwd prometheus >/dev/null || \
     useradd -r -g prometheus -d /dev/null -s /sbin/nologin \
     -c "Prometheus exporter user" prometheus
-mkdir -p /etc/sudoers.d/
-echo "prometheus ALL = NOPASSWD: /usr/sbin/lctl get_param *" > /etc/sudoers.d/prometheus
-chmod 0440 /etc/sudoers.d/prometheus
+cp etc/sudoers.d/%{name} /etc/sudoers.d/%{name}
 exit 0
 
 %post
@@ -66,5 +63,7 @@ systemctl start %{name}.service
 %files
 %defattr(-,root,root,-)
 %config /etc/sysconfig/prometheus-lustre-exporter.options
+%attr(0440, root, root) /etc/sudoers.d/prometheus-lustre-exporter
 %{_bindir}/lustre_exporter
 %{_unitdir}/%{name}.service
+%dir %attr(0700, prometheus, prometheus) /var/log/prometheus-lustre-exporter

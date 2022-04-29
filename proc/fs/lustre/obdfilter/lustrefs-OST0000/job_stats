@@ -1,4 +1,18 @@
 job_stats:
+- job_id:
+  snapshot_time:   1510782606
+  read_bytes:      { samples:         125, unit: bytes, min:    4096, max:    4096, sum:          512000 }
+  write_bytes:     { samples:       64575, unit: bytes, min:    4096, max: 4194304, sum:    215147593728 }
+  getattr:         { samples:           7, unit:  reqs }
+  setattr:         { samples:          43, unit:  reqs }
+  punch:           { samples:           1, unit:  reqs }
+  sync:            { samples:           8, unit:  reqs }
+  destroy:         { samples:          12, unit:  reqs }
+  create:          { samples:           5, unit:  reqs }
+  statfs:          { samples:           6, unit:  reqs }
+  get_info:        { samples:          23, unit:  reqs }
+  set_info:        { samples:          74, unit:  reqs }
+  quotactl:        { samples:           9, unit:  reqs }
 - job_id:          24
   snapshot_time:   1510782606
   read_bytes:      { samples:         125, unit: bytes, min:    4096, max:    4096, sum:          512000 }

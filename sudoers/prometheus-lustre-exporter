@@ -1,0 +1,4 @@
+# !log_allowed setting should be used insetad, but is only supported by version 1.8.29 or higher.
+
+Defaults:prometheus !syslog
+prometheus ALL = NOPASSWD: /usr/sbin/lctl get_param *

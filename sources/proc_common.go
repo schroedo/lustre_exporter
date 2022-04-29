@@ -31,7 +31,7 @@ const (
 
 var (
 	numRegexPattern      = regexp.MustCompile(`[0-9]*\.[0-9]+|[0-9]+`)
-	jobidRegexPattern    = regexp.MustCompile(`job_id:\s*(.*[\d\w\.\_]+)`)
+	jobidRegexPattern    = regexp.MustCompile(`(?m:job_id: *([\d\w\.\:\_\-\+\/ ]*)$)`)
 	jobStatsRegexPattern = regexp.MustCompile(`(?ms:job_id:.*?$.*?(?:-|\z))`)
 )
 
@@ -106,9 +106,12 @@ func regexCaptureNumbers(textToMatch string) (matchedNumbers []string) {
 	return matchedNumbers
 }
 
-func regexCaptureJobids(textToMatch string) (matchedJobids []string) {
-	matchedJobids = jobidRegexPattern.FindStringSubmatch(textToMatch)
-	return matchedJobids
+func regexCaptureJobid(textToMatch string) string {
+	match := jobidRegexPattern.FindStringSubmatch(textToMatch)
+	if len(match) != 2 {
+		return ""
+	}
+	return match[1]
 }
 
 func regexCaptureJobStats(textToMatch string) (matchedJobStats []string) {

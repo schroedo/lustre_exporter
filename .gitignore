@@ -2,6 +2,6 @@
 ################
 *~
 
-/lustre_exporter
-
+lustre_exporter
+build
 .vscode

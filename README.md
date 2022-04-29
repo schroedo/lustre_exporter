@@ -5,90 +5,60 @@
 [![Build Status](https://travis-ci.org/HewlettPackard/lustre_exporter.svg?branch=master)](https://travis-ci.org/HewlettPackard/lustre_exporter)
 -->
 
-[Prometheus](https://prometheus.io/) exporter for Lustre metrics.
+[Prometheus](https://prometheus.io/) exporter for [Lustre](https://www.lustre.org/) metrics.  
+
+Supported Lustre version is: 2.12.
 
 ## Getting
 
-```
-go get github.com/GSI-HPC/lustre_exporter
-```
-## Prerequisites
-
-The listed versions below have been successfully used.  
-Higher verions 
-
-### Required
-
-* [Golang](https://golang.org/)
-* [Prometheus Utility Tool (promu)](https://github.com/prometheus/promu)
-
-### Optional
-
-* [Fast linters runner for Go (golangci-lint)](https://github.com/golangci/golangci-lint)
+Clone the repository.
 
 ## Building
 
-The build has been accomplished with the following versions successfully yet:  
-
-* golang: 1.15.5
-* promu: 0.12.0
-* golangci-lint: 1.33.0
-
-### Promu
-
-Latest version:  
-
-`go get -u github.com/prometheus/promu`
-
-Alternatively, specific version:  
-
-```
-git clone https://github.com/prometheus/promu.git $GOPATH/src/github.com/prometheus/promu
-git -C $GOPATH/src/github.com/prometheus/promu/ checkout v0.12.0
-make -C $GOPATH/src/github.com/prometheus/promu/ build
-cp $GOPATH/src/github.com/prometheus/promu/promu $GOPATH/bin/
-```
-
-### Golangci-lint
-
-Latest version:  
-
-`go get -u github.com/golangci/golangci-lint`
-
-Alternatively, specific version:  
-
-```
-git clone https://github.com/golangci/golangci-lint.git $GOPATH/src/github.com/golangci/golangci-lint/
-git -C $GOPATH/src/github.com/golangci/golangci-lint/ checkout v1.33.0
-make -C $GOPATH/src/github.com/golangci/golangci-lint/ build
-cp $GOPATH/src/github.com/golangci/golangci-lint/golangci-lint $GOPATH/bin/
-```
-
 ### Exporter
 
-For just building the exporter:
+For just building the exporter:  
+`make build`
 
-```
-cd $GOPATH/src/github.com/GSI-HPC/lustre_exporter
-make build
-```
+Building the exporter with code testing, formatting and linting:  
+`make`
 
-Building the exporter with code testing, formatting and linting:
-
-```
-cd $GOPATH/src/github.com/GSI-HPC/lustre_exporter
-make
-```
+Required for build with code linting:  
+`go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
 
 ### RPM Package Build
 
-[Manual RPM Package Creation](rpm/README.md)
+A CentOS7 RPM package can be build by using a 
+1. Shell build script in `rpm/build.sh`
+2. Docker build container, see section below.
+
+### Docker - Build Container
+
+#### Binary Build Container
+
+A Debian container is based on the offical golang:1.17.5-bullseye container image for just providing the binary.
+
+```shell
+# from repo base dir run
+docker build  --tag lustre_exporter -f docker/Dockerfile .
+docker run -v $PWD:/cpy -it lustre_exporter
+```
+The binary will be available in `build/lustre_exporter-X.X.X`.
+
+#### RPM Build Container
+
+A CentOS7 container is based on the official CentOS7 container image for providing the exporter in a RPM package.
+
+```shell
+# from repo base dir run
+docker build -t rpm_dock -f docker/RPM-Dockerfile .
+docker run -v $PWD:/rpm -it rpm_dock
+```
+The RPM package will be available in `build/x86_64/prometheus-lustre-exporter-X.X.X-X.X.el7.x86_64.rpm`.
 
 ## Running
 
-```
-./lustre_exporter <flags>
-```
+`./lustre_exporter <flags>`
 
 ### Flags
 

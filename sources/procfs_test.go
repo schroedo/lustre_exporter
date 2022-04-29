@@ -18,37 +18,65 @@ import (
 )
 
 func TestGetJobNum(t *testing.T) {
-	testString := "job_id: 1234"
-	expected := "1234"
 
-	jobID, err := getJobNum(testString)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if jobID != expected {
-		t.Fatalf("Retrieved an unexpected Job ID. Expected: %s, Got: %s", expected, jobID)
+	tests := map[string]string{
+		"job_id: 1234":                      "1234",
+		"job_id: ABCD":                      "ABCD",
+		"job_id:  abc .0123 .-_+ AB.1000  ": "abc .0123 .-_+ AB.1000",
+		"job_id:            kworker/86:1.0": "kworker/86:1.0",
 	}
 
-	testString = "job_id: ABCD"
-	expected = ""
-
-	jobID, err = getJobNum(testString)
-	if err != nil {
-		t.Fatal(err)
+	for testString, expected := range tests {
+		jobID, err := getJobNum(testString)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if jobID != expected {
+			t.Fatalf("Received an unexpected jobid. Expected: %s, Got: %s", expected, jobID)
+		}
 	}
-	if jobID != expected {
-		t.Fatalf("Retrieved an unexpected Job ID. Expected: %s, Got: %s", expected, jobID)
+
+	_, err := getJobNum("")
+	if err == nil {
+		t.Fatal("An error was expected for an empty jobid, but not received")
 	}
 
-	testString = "job_id:  abc .0123 .-_+ AB.1000  "
-	expected = "abc .0123 .-_+ AB.1000"
+	testJobBlock := `- job_id:
+  snapshot_time:   1493326943
+  read_bytes:      { samples:         126, unit: bytes, min: 1048576, max: 1048576, sum:       132120576 }
+  write_bytes:     { samples:         262, unit: bytes, min: 1048576, max: 1048576, sum:       274726912 }
+  getattr:         { samples:           1, unit:  reqs }
+  setattr:         { samples:           2, unit:  reqs }
+  punch:           { samples:           3, unit:  reqs }
+  sync:            { samples:           4, unit:  reqs }
+  destroy:         { samples:           5, unit:  reqs }
+  create:          { samples:           6, unit:  reqs }
+  statfs:          { samples:           7, unit:  reqs }
+  get_info:        { samples:           8, unit:  reqs }
+  set_info:        { samples:           9, unit:  reqs }
+  quotactl:        { samples:           10, unit:  reqs }
+  - job_id: 28
+  snapshot_time:   1493326943
+  read_bytes:      { samples:         126, unit: bytes, min: 1048576, max: 1048576, sum:       132120576 }
+  write_bytes:     { samples:         262, unit: bytes, min: 1048576, max: 1048576, sum:       274726912 }
+  getattr:         { samples:           1, unit:  reqs }
+  setattr:         { samples:           2, unit:  reqs }
+  punch:           { samples:           3, unit:  reqs }
+  sync:            { samples:           4, unit:  reqs }
+  destroy:         { samples:           5, unit:  reqs }
+  create:          { samples:           6, unit:  reqs }
+  statfs:          { samples:           7, unit:  reqs }
+  get_info:        { samples:           8, unit:  reqs }
+  set_info:        { samples:           9, unit:  reqs }
+  quotactl:        { samples:           10, unit:  reqs }`
+	expectedJobId := ""
 
-	jobID, err = getJobNum(testString)
-	if err != nil {
-		t.Fatal(err)
+	jobID, err := getJobNum(testJobBlock)
+	if err == nil {
+		t.Fatal("An error was expected for an empty jobid, but not received")
 	}
-	if jobID != expected {
-		t.Fatalf("Retrieved an unexpected Job ID. Expected: %s, Got: %s", expected, jobID)
+	if jobID != expectedJobId {
+		t.Fatalf("Expected empty jobid. Got: %s", jobID)
 	}
 }
 
@@ -199,14 +227,54 @@ func TestGetJobStats(t *testing.T) {
 	if metricList[5].title != testPromName {
 		t.Fatalf("Retrieved an unexpected name. Expected: %s, Got: %s", testPromName, metricList[5].title)
 	}
+}
 
-	testJobBlock = "- job_id:           31"
-	testPromName = "job_write_bytes_total"
-	testHelpText = writeTotalHelp
+func TestJobStatBlockIds(t *testing.T) {
 
-	_, err = getJobStatsIOMetrics(testJobBlock, testJobID, testPromName, testHelpText)
-	if err != nil {
-		t.Fatal(err)
+	testJobBlocks := `- job_id: 67
+	snapshot_time:   1493326943
+	read_bytes:      { samples:         126, unit: bytes, min: 1048576, max: 1048576, sum:       132120576 }
+	write_bytes:     { samples:         262, unit: bytes, min: 1048576, max: 1048576, sum:       274726912 }
+	getattr:         { samples:           1, unit:  reqs }
+	setattr:         { samples:           2, unit:  reqs }
+	punch:           { samples:           3, unit:  reqs }
+	sync:            { samples:           4, unit:  reqs }
+	destroy:         { samples:           5, unit:  reqs }
+	create:          { samples:           6, unit:  reqs }
+	statfs:          { samples:           7, unit:  reqs }
+	get_info:        { samples:           8, unit:  reqs }
+	set_info:        { samples:           9, unit:  reqs }
+	quotactl:        { samples:           10, unit:  reqs }
+	- job_id: 28
+	snapshot_time:   1493326943
+	read_bytes:      { samples:         126, unit: bytes, min: 1048576, max: 1048576, sum:       132120576 }
+	write_bytes:     { samples:         262, unit: bytes, min: 1048576, max: 1048576, sum:       274726912 }
+	getattr:         { samples:           1, unit:  reqs }
+	setattr:         { samples:           2, unit:  reqs }
+	punch:           { samples:           3, unit:  reqs }
+	sync:            { samples:           4, unit:  reqs }
+	destroy:         { samples:           5, unit:  reqs }
+	create:          { samples:           6, unit:  reqs }
+	statfs:          { samples:           7, unit:  reqs }
+	get_info:        { samples:           8, unit:  reqs }
+	set_info:        { samples:           9, unit:  reqs }
+	quotactl:        { samples:           10, unit:  reqs }`
+
+	expectedJobIds := []string{"67", "28"}
+
+	matchedJobBlocks := regexCaptureJobStats(testJobBlocks)
+
+	if l := len(matchedJobBlocks); l != 2 {
+		t.Fatalf("Retrieved an unexpected number of items. Expected: %d, Got: %d", 2, l)
 	}
 
+	for index, expected := range expectedJobIds {
+		jobId, err := getJobNum(matchedJobBlocks[index])
+		if err != nil {
+			t.Fatal(err)
+		}
+		if jobId != expected {
+			t.Fatalf("Received an unexpected jobId. Expected: %s, Got: %s", expected, jobId)
+		}
+	}
 }
