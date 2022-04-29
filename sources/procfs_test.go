@@ -30,7 +30,7 @@ func TestGetJobNum(t *testing.T) {
 	}
 
 	testString = "job_id: ABCD"
-	expected = "ABCD"
+	expected = ""
 
 	jobID, err = getJobNum(testString)
 	if err != nil {
