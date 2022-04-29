@@ -21,8 +21,6 @@ import (
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/log"
-	"errors"
 )
 
 const (
@@ -596,10 +594,10 @@ func getJobStatsIOMetrics(jobBlock string, jobID string, promName string, helpTe
 }
 
 func getJobNum(jobBlock string) (jobID string, err error) {
-     	jobID = regexCaptureString("job_id: .*", jobBlock)
+	jobID = regexCaptureString("job_id: .*", jobBlock)
 	matched := regexCaptureJobids(jobID)
 	if len(matched) < 2 {
-	   return "", errors.New("No valid JobID found in jobid string: #" + jobID + "#")
+		return "", nil
 	}
 	return matched[1], nil
 }
@@ -660,9 +658,7 @@ func parseJobStatsText(jobStats string, promName string, helpText string, hasMul
 	for _, job := range jobs {
 		jobID, err := getJobNum(job)
 		if err != nil {
-		// error handling: log error to system log and ignore the entry
-		   log.Errorf("ERROR: getJobNum failed: %s", err)
-		   continue
+			return nil, err
 		}
 		if hasMultipleVals {
 			jobList, err = getJobStatsOperationMetrics(job, jobID, promName, helpText)
