@@ -167,10 +167,8 @@ func main() {
 
 	sourceList, errList := loadSources(enabledSources)
 
-	if errList != nil {
-		for _, err := range errList {
-			log.Errorf("Couldn't load source: %s", err)
-		}
+	for _, err := range errList {
+		log.Errorf("Couldn't load source: %s", err)
 	}
 
 	log.Infof("Available sources:")
